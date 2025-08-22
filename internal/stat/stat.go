@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"errors"
 	"fmt"
+	"log/slog"
 	"os"
 	"strconv"
 	"strings"
@@ -39,7 +40,11 @@ func (c *CPUStatParser) ReadCPU() error {
 	if err != nil {
 		return fmt.Errorf("%w: %w", ErrOpenFile, err)
 	}
-	defer file.Close()
+	defer func() {
+		if err := file.Close(); err != nil {
+			slog.Error("failed to close file", "path", procStatPath, "err", err)
+		}
+	}()
 
 	scanner := bufio.NewScanner(file)
 	if !scanner.Scan() {

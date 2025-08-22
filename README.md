@@ -1,5 +1,11 @@
 # pulsar
 
+[![Go Reference](https://pkg.go.dev/badge/github.com/hahaclassic/pulsar.svg)](https://pkg.go.dev/github.com/hahaclassic/pulsar)
+[![Go Version](https://img.shields.io/badge/go-1.25-blue.svg)](https://golang.org)
+[![Platform](https://img.shields.io/badge/platform-linux%20-blue)]()
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](./LICENSE)
+[![Build](https://github.com/hahaclassic/pulsar/actions/workflows/ci.yml/badge.svg)](https://github.com/hahaclassic/pulsar/actions/workflows/ci.yml)
+
 >I once set out to walk a hundred thousand steps in a single day. By the sixty-three-thousandth, my heart ached fiercely,
 though I have devoted my life to sport and movement. For the first time, I felt true, unshakable fear. In such moments, one realizes: a human is not a machine, and a machine, in turn, is not human. Yet what if — just for a fleeting instant — we could endow a soulless machine with a fragment of humanity?
 

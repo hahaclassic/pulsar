@@ -1,34 +1,80 @@
 package cpustat
 
 import (
+	"bufio"
+	"errors"
+	"fmt"
 	"os"
 	"strconv"
 	"strings"
 )
 
-func ReadCPU() (idle, total uint64, err error) {
-	data, err := os.ReadFile("/proc/stat")
-	if err != nil {
-		return
-	}
-	lines := strings.Split(string(data), "\n")
-	fields := strings.Fields(lines[0]) // "cpu ..."
-	var values []uint64
-	for _, f := range fields[1:] {
-		v, _ := strconv.ParseUint(f, 10, 64)
-		values = append(values, v)
-	}
-	for _, v := range values {
-		total += v
-	}
-	idle = values[3] // idle field
-	return
+const (
+	procStatPath = "/proc/stat"
+)
+
+var (
+	ErrOpenFile          = errors.New("cpu parser: failed to open file")
+	ErrNoTokensAvailable = errors.New("cpu parser: no tokens available")
+	ErrScanRow           = errors.New("cpu parser: scan error")
+)
+
+type CPUStatParser struct {
+	idle  [2]uint64
+	total [2]uint64
 }
 
-// Usage returns cpu usage like: 56.2 (%)
-func Usage(prevIdle, prevTotal, currIdle, currTotal uint64) float64 {
-	idleTicks := float64(currIdle - prevIdle)
-	totalTicks := float64(currTotal - prevTotal)
+func NewParser() (*CPUStatParser, error) {
+	c := &CPUStatParser{}
+
+	if err := c.ReadCPU(); err != nil {
+		return nil, err
+	}
+
+	return c, nil
+}
+
+func (c *CPUStatParser) ReadCPU() error {
+	file, err := os.Open(procStatPath)
+	if err != nil {
+		return fmt.Errorf("%w: %w", ErrOpenFile, err)
+	}
+	defer file.Close()
+
+	scanner := bufio.NewScanner(file)
+	if !scanner.Scan() {
+		if err := scanner.Err(); err != nil {
+			return fmt.Errorf("%w: %w", ErrScanRow, err)
+		}
+
+		return ErrNoTokensAvailable
+	}
+
+	row := scanner.Text() // "cpu ..."
+	fields := strings.Fields(row)
+
+	var total, idle uint64
+	for i, f := range fields[1:] {
+		v, _ := strconv.ParseUint(f, 10, 64)
+		total += v
+		if i == 3 { // idle field
+			idle = v
+		}
+	}
+
+	c.idle[0], c.total[0] = c.idle[1], c.total[1]
+	c.total[1], c.idle[1] = total, idle
+
+	return nil
+}
+
+func (c *CPUStatParser) Usage() float64 {
+	if c.total[1] < c.total[0] {
+		return 0
+	}
+
+	idleTicks := float64(c.idle[1] - c.idle[0])
+	totalTicks := float64(c.total[1] - c.total[0])
 
 	return 100 * (1.0 - idleTicks/totalTicks)
 }

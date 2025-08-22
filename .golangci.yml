@@ -1,0 +1,11 @@
+version: 2
+
+issues:
+  exclude-dirs:
+    - tools
+
+linters:
+  enable-all: true
+
+run:
+  timeout: 1m

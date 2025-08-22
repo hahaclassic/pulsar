@@ -63,6 +63,8 @@ make stress-test
 
 This launches multiple goroutines (n is number of goroutines) to fully load your CPU, allowing you to observe the Pulsar reacting with higher BPM values.
 
+## Example
+![exapmle](./gif/example.gif)
 
 ## License
 Licensed under [MIT License](./LICENSE).

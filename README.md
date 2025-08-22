@@ -23,6 +23,10 @@ cpu: 60.2%      bpm: 129
 - Graceful shutdown (via `Ctrl+C` or `SIGTERM`).
 - Lightweight and fun way to monitor your computer.
 
+## Platform Support
+
+- Linux only (requires `/proc/stat` for CPU usage)
+
 ## Installation
 
 ### Clone the repository
